@@ -24,7 +24,7 @@ OUT = Path(__file__).resolve().parents[1] / "output"
 
 def _need_subject(code: str, name: str, rater: str) -> str | None:
     if not (code or "").strip():
-        return "请先填写编号，并点「保存/打开该被检人」。"
+        return "请先填写编号，并点「保存/打开该被检人」。 / Enter a case code first, then click Save / Open case."
     upsert_subject(code, name, rater)
     return None
 
@@ -45,10 +45,10 @@ def ui_save_subject(code: str, name: str, rater: str):
 
     if not (code or "").strip():
         ch = subject_choices()
-        return gr.update(choices=ch), "编号不能空。", [], _dd("")
+        return gr.update(choices=ch), "编号不能空。 / Case code cannot be empty.", [], _dd("")
     upsert_subject(code, name, rater)
     ch = subject_choices()
-    return gr.update(choices=ch, value=ch[0] if ch else None), f"已保存被检人 {code} {name}", list_audio(code), _dd(code)
+    return gr.update(choices=ch, value=ch[0] if ch else None), f"已保存被检人 / Case saved: {code} {name}", list_audio(code), _dd(code)
 
 
 def ui_pick_subject(choice: str):
@@ -76,21 +76,21 @@ def ui_save_clip(audio, code: str, name: str, rater: str, label: str, prompt_tex
         return None, err, list_audio(code) if code else [], _dd(code)
     src = resolve_audio(audio)
     if src is None:
-        return None, "请先录音或导入音频。", list_audio(code), _dd(code)
+        return None, "请先录音或导入音频。 / Record or upload audio first.", list_audio(code), _dd(code)
     dest = save_audio(code, src, label or "未标任务")
     _write_prompt(dest, prompt_text)
-    return str(dest), f"已保存：{dest.name}", list_audio(code), _dd(code)
+    return str(dest), f"已保存 / Saved: {dest.name}", list_audio(code), _dd(code)
 
 
 def ui_use_listed(code: str, filename: str):
     if not code:
-        return None, "请先打开被检人。"
+        return None, "请先打开被检人。 / Open a case first."
     if not filename:
-        return None, "请在下拉框选择一段已保存录音。"
+        return None, "请在下拉框选择一段已保存录音。 / Choose a saved recording from the list."
     p = audio_path(code, str(filename))
     if p is None:
-        return None, "找不到该文件。"
-    return str(p), f"已载入 {p.name}"
+        return None, "找不到该文件。 / File not found."
+    return str(p), f"已载入 / Loaded: {p.name}"
 
 
 def ui_analyze(audio, code: str, name: str, rater: str, grade: str, label: str, prompt_text: str = ""):
@@ -99,7 +99,7 @@ def ui_analyze(audio, code: str, name: str, rater: str, grade: str, label: str, 
         return None, err
     src = resolve_audio(audio)
     if src is None:
-        return None, "请先录音、导入，或从列表载入一段。"
+        return None, "请先录音、导入，或从列表载入一段。 / Record, upload, or load a saved recording first."
     dest = save_audio(code, src, label or "整段分析")
     _write_prompt(dest, prompt_text)
     rec = extract_features(dest)
@@ -123,7 +123,7 @@ def ui_align(audio, code: str, name: str, rater: str, keywords: str, label: str,
         return err
     src = resolve_audio(audio)
     if src is None:
-        return "请先录音、导入，或从列表载入一段。"
+        return "请先录音、导入，或从列表载入一段。 / Record, upload, or load a saved recording first."
     dest = save_audio(code, src, label or "切窗")
     _write_prompt(dest, prompt_text)
     cmd_align(dest, (keywords or "").strip() or None, prompt_text)
@@ -147,7 +147,7 @@ def ui_tts() -> str:
     extra = json.loads(sr.read_text(encoding="utf-8")) if sr.exists() else {}
     csv_p = OUT / "features_align_say_card.csv"
     tail = csv_p.read_text(encoding="utf-8") if csv_p.exists() else ""
-    return format_align_zh(extra, tail, note="TTS 演示句，非患儿。")
+    return format_align_zh(extra, tail, note="TTS 演示句，非患儿。 / TTS demo sentence, not a patient.")
 
 
 def ui_report() -> tuple:
@@ -156,7 +156,7 @@ def ui_report() -> tuple:
     cmd_report()
     png = OUT / "plots" / "pair_sim_pre_post_2d.png"
     pdf = OUT / "reports" / "阶段一-本机MVP预实验报告-模拟对照.pdf"
-    note = f"PDF：{pdf}\n对照为 DSP 模拟，非真实患儿。"
+    note = f"PDF：{pdf}\n对照为 DSP 模拟，非真实患儿。 / Simulated comparison, not real patients."
     return (str(png) if png.exists() else None), note
 
 
@@ -169,73 +169,73 @@ def launch(port: int = 7860, inbrowser: bool = True) -> None:
       overflow-y: auto !important;
     }
     """
-    with gr.Blocks(title="鼻音声学 MVP", css=css) as demo:
+    with gr.Blocks(title="鼻音声学 MVP / Nasal Resonance MVP", css=css) as demo:
         gr.Markdown(
-            f"# 唇腭裂过高鼻音客观化 · 本机 MVP `{__version__}`\n\n"
-            f"{DISCLAIMER} 仅 127.0.0.1。编号请用内部号，勿用住院号；本机保存，不上云。"
+            f"# 唇腭裂过高鼻音客观化 · 本机 MVP / Cleft Palate Hypernasality — Local MVP `{__version__}`\n\n"
+            f"{DISCLAIMER} 仅 127.0.0.1。编号请用内部号，勿用住院号；本机保存，不上云。\n\n*Research and education aid only, not a diagnostic tool. Runs on 127.0.0.1 only; use internal case codes, never hospital IDs; data stays on this computer.*"
         )
         with gr.Row():
-            code = gr.Textbox(label="编号（内部）", scale=1)
-            subj = gr.Textbox(label="被检人姓名", scale=1)
-            rater = gr.Textbox(label="听感评分人", scale=1)
+            code = gr.Textbox(label="编号（内部） / Case code (internal)", scale=1)
+            subj = gr.Textbox(label="被检人姓名 / Speaker name", scale=1)
+            rater = gr.Textbox(label="听感评分人 / Perceptual rater", scale=1)
         with gr.Row():
-            btn_save = gr.Button("保存/打开该被检人", variant="primary")
-            picker = gr.Dropdown(label="已有被检人", choices=subject_choices(), allow_custom_value=False)
+            btn_save = gr.Button("保存/打开该被检人 / Save / Open case", variant="primary")
+            picker = gr.Dropdown(label="已有被检人 / Existing cases", choices=subject_choices(), allow_custom_value=False)
         files = gr.Dataframe(
-            headers=["文件名", "任务标签", "路径"],
-            label="该编号下已保存的录音",
+            headers=["文件名 / File", "任务标签 / Task", "路径 / Path"],
+            label="该编号下已保存的录音 / Saved recordings for this case",
             interactive=False,
             wrap=True,
         )
-        clip_dd = gr.Dropdown(label="选择已保存的一段", choices=[])
-        load_btn = gr.Button("载入到下面的共用音频")
-        status = gr.Textbox(label="状态", lines=2)
+        clip_dd = gr.Dropdown(label="选择已保存的一段 / Choose a saved recording", choices=[])
+        load_btn = gr.Button("载入到下面的共用音频 / Load into shared audio below")
+        status = gr.Textbox(label="状态 / Status", lines=2)
 
-        gr.Markdown("### 朗读提示（请被检人照此朗读后再录音）")
+        gr.Markdown("### 朗读提示（请被检人照此朗读后再录音） / Reading prompt (speaker reads this, then record)")
         with gr.Row():
-            prompt_dd = gr.Dropdown(label="常用测试句", choices=load_bank(), value=load_bank()[0])
-            btn_load_p = gr.Button("载入到朗读框")
-            btn_add_p = gr.Button("把当前句加入常用")
+            prompt_dd = gr.Dropdown(label="常用测试句 / Saved test sentences", choices=load_bank(), value=load_bank()[0])
+            btn_load_p = gr.Button("载入到朗读框 / Load into prompt")
+            btn_add_p = gr.Button("把当前句加入常用 / Save current sentence")
         prompt = gr.Textbox(
-            label="请照此朗读",
+            label="请照此朗读 / Please read aloud",
             value=load_bank()[0],
             lines=3,
-            placeholder="可改字、可从常用句载入",
+            placeholder="可改字、可从常用句载入 / Edit, or load a saved sentence",
         )
 
-        gr.Markdown("### 共用音频（整段分析与 SenseVoice 切窗用同一段）")
-        audio = gr.Audio(sources=["upload", "microphone"], type="filepath", label="录音或导入 wav")
-        label = gr.Textbox(label="本段任务标签（如：卡片句 / 持续/a/ / 术后2周）", value="卡片句")
-        save_clip = gr.Button("仅保存本段到该编号（不分析）")
+        gr.Markdown("### 共用音频（整段分析与 SenseVoice 切窗用同一段） / Shared audio (used by both whole-clip analysis and SenseVoice windows)")
+        audio = gr.Audio(sources=["upload", "microphone"], type="filepath", label="录音或导入 wav / Record or upload audio (wav)")
+        label = gr.Textbox(label="本段任务标签（如：卡片句 / 持续/a/ / 术后2周） / Task label (e.g. card sentence, sustained /a/, 2 weeks post-op)", value="卡片句")
+        save_clip = gr.Button("仅保存本段到该编号（不分析） / Save to case only (no analysis)")
 
         with gr.Row():
             with gr.Column():
-                grade = gr.Dropdown(["未填", "0", "1", "2", "3"], value="未填", label="过高鼻音 0–3（人工）")
-                btn_an = gr.Button("整段分析 + 2D 语谱")
+                grade = gr.Dropdown(["未填", "0", "1", "2", "3"], value="未填", label="过高鼻音 0–3（人工） / Hypernasality 0–3 (clinician rating)")
+                btn_an = gr.Button("整段分析 + 2D 语谱 / Analyze whole clip + spectrogram")
             with gr.Column():
-                kws = gr.Textbox(label="切窗关键词", value="爸,怕,打,靶,妈,奶")
-                btn_al = gr.Button("同一段：SenseVoice 切窗 + 自参照")
-        img = gr.Image(label="2D 语谱图")
+                kws = gr.Textbox(label="切窗关键词 / Window keywords", value="爸,怕,打,靶,妈,奶")
+                btn_al = gr.Button("同一段：SenseVoice 切窗 + 自参照 / SenseVoice word windows + self-ref index")
+        img = gr.Image(label="2D 语谱图 / Spectrogram")
         with gr.Row():
             feat_left = gr.Textbox(
-                label="左：整段分析特征",
+                label="左：整段分析特征 / Left: whole-clip features",
                 lines=18,
                 max_lines=18,
                 autoscroll=False,
                 elem_id="feat-left",
             )
             feat_right = gr.Textbox(
-                label="右：SenseVoice 切窗 + 自参照",
+                label="右：SenseVoice 切窗 + 自参照 / Right: word windows + self-ref index",
                 lines=18,
                 max_lines=18,
                 autoscroll=False,
                 elem_id="feat-right",
             )
         with gr.Row():
-            gr.Button("TTS 演示句（非患儿）").click(ui_tts, outputs=feat_right)
-            btn_rep = gr.Button("生成模拟术前/术后 PDF")
-        img_rep = gr.Image(label="模拟对照图")
-        note_rep = gr.Textbox(label="报告路径")
+            gr.Button("TTS 演示句（非患儿） / TTS demo (not a patient)").click(ui_tts, outputs=feat_right)
+            btn_rep = gr.Button("生成模拟术前/术后 PDF / Generate simulated pre/post PDF")
+        img_rep = gr.Image(label="模拟对照图 / Simulated comparison chart")
+        note_rep = gr.Textbox(label="报告路径 / Report path")
 
         def _load_prompt(choice):
             return choice or ""
@@ -244,7 +244,7 @@ def launch(port: int = 7860, inbrowser: bool = True) -> None:
             import gradio as gr
 
             bank = add_prompt(text)
-            return gr.update(choices=bank, value=text.strip() if text and text.strip() else None), "已加入常用测试句。"
+            return gr.update(choices=bank, value=text.strip() if text and text.strip() else None), "已加入常用测试句。 / Added to saved sentences."
 
         btn_load_p.click(_load_prompt, [prompt_dd], [prompt])
         prompt_dd.change(_load_prompt, [prompt_dd], [prompt])
