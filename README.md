@@ -2,7 +2,7 @@
 
 > **Disclaimer:** Research and education aid only. This tool does **not** diagnose velopharyngeal insufficiency (VPI) or any condition, and its features are not a validated "nasalance" score. Perceptual ratings are entered by qualified clinicians. Do not upload identifiable patient data.
 
-![UI](docs/ui-screenshot.png)
+![Gradio UI (case list hidden for privacy)](docs/ui-screenshot.png)
 
 ## What it does
 A local-only (127.0.0.1) app that extracts acoustic features related to hypernasality from short Mandarin speech prompts used in CLP speech follow-up:
@@ -28,11 +28,20 @@ python -m nasal_mvp align-demo
 python -m nasal_mvp report
 ```
 
-## Privacy
-No recordings are included. Only synthetic audio is used for demos. Never commit clinical WAVs, names, or hospital IDs.
+## Privacy & testing
+The pipeline has been tested on real voluntary voice recordings made by the author. These recordings are **not published** for privacy reasons and are excluded from this repository. A synthetic audio generator (`python -m nasal_mvp demo`, `demo-stereo`) is included so anyone can test the pipeline without real recordings. Never commit clinical WAVs, names, or hospital IDs.
 
 ## Status
-S1 MVP: pipeline works on synthetic and self-recorded test audio. Missing: ethics approval, real paired pre/post-op data, clinician perceptual gold standard.
+S1 MVP: the pipeline runs end-to-end on the author's real test recordings and on synthetic audio.
+
+## Roadmap & collaboration
+I am looking for **clinical speech-language pathologists (SLPs) and cleft speech-clinic collaborators**. Planned steps:
+1. Ethics/IRB approval with partner clinics.
+2. Collect paired pre-/post-operative recordings with informed consent, with clinician perceptual ratings of hypernasality.
+3. Validate the acoustic features against those clinician ratings.
+4. Goal: a **clinical speech-therapy assistance aid** that helps SLPs track progress. It is not a diagnostic device and will need clinical validation before any clinical use.
+
+Interested? Please open an issue on this repository.
 
 ## Built with
 Cursor, during MLH Global Hack Week: Hacktoberfest 2026.
