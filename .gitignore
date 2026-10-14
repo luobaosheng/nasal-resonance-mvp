@@ -1,0 +1,19 @@
+.venv/
+.modelscope_cache/
+__pycache__/
+*.pyc
+.DS_Store
+.env*
+# all generated output, cases, uploads, windows, features
+output/
+# never publish any recordings
+*.wav
+*.aiff
+*.m4a
+*.mp3
+*.flac
+# internal planning docs
+01_方案与需求/
+*.docx
+*.pdf
+*.csv
