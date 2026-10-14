@@ -2,6 +2,8 @@
 
 > **Disclaimer:** Research and education aid only. This tool does **not** diagnose velopharyngeal insufficiency (VPI) or any condition, and its features are not a validated "nasalance" score. Perceptual ratings are entered by qualified clinicians. Do not upload identifiable patient data.
 
+![UI](docs/ui-screenshot.png)
+
 ## What it does
 A local-only (127.0.0.1) app that extracts acoustic features related to hypernasality from short Mandarin speech prompts used in CLP speech follow-up:
 - Synthetic vowel demos (/a i u/, low vs. high nasal stereo simulation)
