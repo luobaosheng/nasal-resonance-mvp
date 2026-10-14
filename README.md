@@ -54,7 +54,7 @@ I am looking for **clinical speech-language pathologists and cleft speech-clinic
 5. Stage 2 (only if justified): dual-channel oral/nasal recording closer to nasometry.
 6. Long-term goal: a **speech-therapy assistance aid** that helps SLPs track progress. It is not a diagnostic device and needs clinical validation before any clinical use.
 
-Interested in collaborating? Please open an issue on this repository.
+Interested in collaborating? Please open a "Clinical collaboration" issue. See CONTRIBUTING.md, CODE_OF_CONDUCT.md and SECURITY.md.
 
 ## Built with
 Cursor, during MLH Global Hack Week: Hacktoberfest 2026.
